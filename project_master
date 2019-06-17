@@ -10,100 +10,69 @@ import pprint
 
 
 num = 1
-webpage = f"https://www.giallozafferano.it/ricette-cat/page{num}/Antipasti/"
+webpage = f"https://www.giallozafferano.it/ricette-cat/page{num}/Primi/"
 response = requests.get(webpage, verify=False)
 print("Status: " + str(response.status_code))
-
-
 doc = bs4.BeautifulSoup(response.text)
 
-# ## First page 
-
-# ### Tutte le ricette della prima pagina
-
-
-lista = doc.find_all('div', class_ = "gz-content-recipe-horizontal")
-titolo = doc.find('h2', class_ = "gz-title")
-
-link = doc.find('h2', class_ = "gz-title").find("a")["href"]
-
-descrizione =  doc.find('div', class_ = "gz-description").text
-
-antipasti_list = []
-for antipasto in lista :
-    titolo = antipasto.find('h2', class_ = "gz-title").text
-    link = antipasto.find('h2', class_ = "gz-title").find("a")["href"]
-    descrizione =  antipasto.find('div', class_ = "gz-description").text
-    antipasti_list.append({'titolo' : titolo, 'link' : link, 'descrizione' : descrizione})
-
-
-
-def parse_antipasti(antipasto):
-    titolo = antipasto.find('h2', class_ = "gz-title").text
-    link = antipasto.find('h2', class_ = "gz-title").find("a")["href"]
-    descrizione =  antipasto.find('div', class_ = "gz-description").text
+def parse_primi(primo):
+    titolo = primo.find('h2', class_ = "gz-title").text
+    link = primo.find('h2', class_ = "gz-title").find("a")["href"]
+    descrizione =  primo.find('div', class_ = "gz-description").text
     return {'titolo' : titolo, 'link' : link, 'descrizione' : descrizione}
 
 
-antipasti_list= []
-for num in tqdm(range(1,11)):
-    webpage = f"https://www.giallozafferano.it/ricette-cat/page{num}/Antipasti/"
+primi_list = []
+for num in tqdm(range(1,201)):
+    webpage = f"https://www.giallozafferano.it/ricette-cat/page{num}/Primi/"
     response = requests.get(webpage,  verify=False)
     doc = bs4.BeautifulSoup(response.text)
-    lista = doc.select('div', class_ = "gz-content-recipe-horizontal")
-    for antipasto in lista:
+    lista = doc.findAll('div', class_ = "gz-content-recipe-horizontal")
+    for primo in lista:
         try:
-            antipasti_list.append(parse_antipasti(antipasto))
+            primi_list.append(parse_primi(primo))
         except:
             pass
-
-print(len(antipasti_list))
+        
+print(len(primi_list))
 
 # creazione dataframe
+
 import pandas as pd
+import numpy as np
+gf_primi= pd.DataFrame(primi_list)
+gf_primi['id_p'] = range(1, len(primi_list)+1)
+gf_primi.head()
+gf_primi.to_csv("gf_primi.csv")
 
-ds_antipasti = pd.DataFrame(antipasti_list)
-ds_antipasti.head(20)
+# ## dettagli
 
-# creazione csv
+dettagli = []
 
-ds_antipasti.info()
-ds_antipasti.to_csv("/home/master/antipasti.csv")
-
-
-# ## Per ogni link
-
-page = f'https://ricette.giallozafferano.it/Polpettine-di-tonno-e-ricotta.html'
-print(page)
-
-resp = requests.get(page, verify = False)
-parse = bs4.BeautifulSoup(resp.text)
-
-dettagli = parse.find_all('span', class_ = 'gz-name-featured-data')
-
-difficolta = dettagli[0].text.split(":")[1]
-
-preparazione = dettagli[1].text.split(":")[1]
-
-cottura = dettagli[2].text.split(":")[1]
-
-dosi_per = dettagli[3].text.split(":")[1]
-
-costo = dettagli[4].text.split(":")[1]
-
-ingredienti = parse.select('dd', class_= 'dz-ingredients')
-len(ingredienti)
-
-
-# ## Lista ingredienti per ricetta
-
-for i in range(0, len(ingredienti)):
-               s = (ingredienti[i].text.split())
-               print(" ".join(s))
-
-n_voti = parse.find('div', class_="rating_rate")["title"]
-print(n_voti)
-n_commenti = parse.find('div', class_='gz-pTop4x').text.replace("\n","")
-print(n_commenti)
-
-
+for item in tqdm(gf_primi.iterrows(), total=gf_primi.shape[0]):
+    try:
+        id_p = item[1][3]
+        link = item[1][1]
+        resp = requests.get(link, verify = False)
+        parse = bs4.BeautifulSoup(resp.text)
+        rate = parse.find('div', class_='rating_panel')['data-content-rate']
+        n_voti = parse.find('div', class_="rating_rate")["title"]
+        n_commenti = parse.find('div', class_='gz-pTop4x').text.replace("\n","")
+        details = parse.findAll('span', class_ = 'gz-name-featured-data')
+        difficolta = details[0].text.split(":")[1]
+        preparazione = details[1].text.split(":")[1]
+        cottura = details[2].text.split(":")[1]
+        dosi_per = details[3].text.split(":")[1]
+        costo = details[4].text.split(":")[1]
+        ingr = parse.select('dd', class_= 'dz-ingredients')
+        n_ingredienti = len(ingr)
+        ingredienti = list(map(lambda x: ' '.join(x.text.split()), ingr))
+    except Exception as e:
+        print(e)
+        pass
+    dettagli.append({'id_p': id_p, 'rate' : rate, 'n_voti': n_voti, 'n_commenti' : n_commenti, 'difficolta': difficolta, 'preparazione': preparazione, 'dosi_per': dosi_per, 'costo': costo, 'n_ingredienti': n_ingredienti, 'ingredienti': ingredienti})
+ 
+import pandas as pd
+ds_dettagli = pd.DataFrame(dettagli)
+ds_dettagli.head()
+ds_dettagli.to_csv("gf_primi_dettagli.csv")
