@@ -2,29 +2,18 @@
 
 Progetto
 
-1. Scenario di analisi
+Analisi di mercato da parte di una catena di supermercati per capire i gusti e le preferenze della popolazione italiana riguardo piatti semplici e casalinghi, in modo da gestire al meglio le scorte in magazzino e avviare due nuovi progetti:
+  1."Piatti pronti": per offrire ai clienti pasti pronti, freschi e semplici ("casalinghi"). 
+  2."In cucina con te", per "accompagnare" il cliente nella preparazione di una ricetta:
+    - ogni giorno verranno selezionate alcune ricette per sezione ('Antipasti', 'Primi Piatti', 'Secondi Piatti') e verranno creati
+      dei box contenti la ricetta e le materie prime pulite e lavate, necessarie per preparare il piatto scelto
 
-- Obiettivo analisi 
-- Domande a cui vogliamo rispondere
+Customer Segment
+  - popolazione attiva
+  - persone con vita frenetica
+  - persone che preferiscono prodotti freschi e non confezionati 
+
+Analizzeremo uno dei blog culinari più utilizzati dalla popolazione italiana: "Giallo Zafferano".
 
 
-2. Fasi di lavoro 
-
-- Scraping (se necessario), importare i dati 
-- Profiling dei dati (che tipo di problemi ci sono nel dataset) e modalità di trattamento da adottare
-- ETL (obbligatoria), mettere in qualità i dati e creare le tabelle sorgenti, area di staging, data warehouse
-
-3. Presentazione
-
-- scenario, tecnologie e architetture di BI adottata
-- obiettivo e domande poste
-- caratteristiche del dataset (struttura e problemi, profiling: colonne, valori nulli)
-- modalità di trattamento (ETL)
-- le criticità emerse
-
-Cosa non deve mancare?
-- Obiettivi 
-- gli stakeholder
-- obiettivi raggiunti
-- obiettivi non raggiunti
-- dove abbiamo sbagliato, cosa si può migliorare
+Wweb scraping con Beautiful Soup.
