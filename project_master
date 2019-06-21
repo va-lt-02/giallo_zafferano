@@ -107,7 +107,7 @@ ds_ingredienti.head()
 
 lista_dettagli = pd.DataFrame.merge(ds_dettagli, ds_ingredienti, on='id_a', how='left')
 
-# step preparazione e link foto 
+# step preparazione e link foto
 
 for i in range(0, len(img)):
     try:
