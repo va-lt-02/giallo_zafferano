@@ -8,6 +8,11 @@ import csv
 from tqdm import tqdm_notebook as tqdm
 import pprint
 
+! pip install --user pyqrcode
+! pip install --user --upgrade pip
+import pyqrcode
+from pyqrcode import QRCode
+
 
 num = 1
 webpage = f"https://www.giallozafferano.it/ricette-cat/page{num}/Antipasti/"
@@ -15,11 +20,15 @@ response = requests.get(webpage, verify=False)
 print("Status: " + str(response.status_code))
 doc = bs4.BeautifulSoup(response.text)
 
+
 def parse_antipasti(antipasto):
     titolo = antipasto.find('h2', class_ = "gz-title").text
     link = antipasto.find('h2', class_ = "gz-title").find("a")["href"]
+    qrcodeurl = pyqrcode.create(link)
+    qrcodeurl.svg(f"/home/master/Desktop/qrcode_antipasti/qrcode-{titolo}.svg", scale=8)
+    filename = f"/home/master/Desktop/qrcode_antipasti/qrcode-{titolo}.svg"
     descrizione =  antipasto.find('div', class_ = "gz-description").text
-    return {'titolo' : titolo, 'link' : link, 'descrizione' : descrizione}
+    return {'titolo' : titolo, 'link' : link, 'descrizione' : descrizione , 'qrcode' : filename}
 
 
 antipasti_list= []
